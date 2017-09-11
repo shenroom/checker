@@ -1,0 +1,8 @@
+
+checker_actions:
+    -
+        name: 'sampleChecker | 样例'
+        skip: False
+        auto: False
+        description: '这是一个简单的样例！'
+        handler: sample_check

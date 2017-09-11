@@ -1,0 +1,28 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>box_hover.png</file>
+    <file>box_checked.png</file>
+    <file>scroll_down.png</file>
+    <file>scroll_down_disabled.png</file>
+    <file>box_unchecked.png</file>
+    <file>scroll_left.png</file>
+    <file>scroll_right.png</file>
+    <file>scroll_right_disabled.png</file>
+    <file>scroll_up.png</file>
+    <file>play_icon_black.png</file>
+    <file>stop_icon_black.png</file>
+    <file>clear_search.png</file>
+    <file>stop_icon.png</file>
+    <file>clock.png</file>
+    <file>failure.png</file>
+    <file>gono.png</file>
+    <file>group_collapse.png</file>
+    <file>group_expand.png</file>
+    <file>play_icon.png</file>
+    <file>refresh.png</file>
+    <file>search.png</file>
+    <file>success.png</file>
+    <file>validation.png</file>
+    <file>correct.png</file>
+  </qresource>
+</RCC>
