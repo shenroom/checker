@@ -68,6 +68,9 @@ class CheckItemWidget(QtGui.QFrame):
         else:
             self.set_state('pass')
             self._parent.output_info(u'Check through！（检查通过！）')
+            if not self._parent._batch:
+                if self.uuid not in self._parent.pass_list:
+                    self._parent.pass_list.append(self.uuid)
             return False
 
     def on_solve_btn_clicked(self):

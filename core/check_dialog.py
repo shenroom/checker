@@ -16,7 +16,7 @@ import os
 class CheckerDialog(QtGui.QDialog):
     def __init__(self, parent=None, config=''):
         super(CheckerDialog, self).__init__(parent)
-        self._ui = Ui_preflight_dialog()
+        self._ui = Ui_check_dialog()
         self._ui.setupUi(self)
         self.setWindowTitle('Checker')
 
@@ -355,7 +355,7 @@ class CheckerDialog(QtGui.QDialog):
         #         self.next_cmd = tank.platform.current_engine().commands['Publish...']['callback']
         #     except:
         #         self.next_cmd = None
-        super(PreflightDialog, self).showEvent(event)
+        super(CheckerDialog, self).showEvent(event)
 
     def closeEvent(self, event):
         """
@@ -367,7 +367,7 @@ class CheckerDialog(QtGui.QDialog):
         if self.hooks_path in sys.path:
             sys.path.remove(self.hooks_path)
         # sys.modules.clear()
-        super(PreflightDialog, self).closeEvent(event)
+        super(CheckerDialog, self).closeEvent(event)
 
     def event(self, event):
         """
@@ -379,7 +379,7 @@ class CheckerDialog(QtGui.QDialog):
         if hasattr(self, 'checker_uuid_list'):
             if self.checker_uuid_list and self.pass_list and self.next_cmd:
                 self._ui.next_btn.setVisible(set(self.checker_uuid_list).issubset(self.pass_list))
-            super(PreflightDialog, self).event(event)
+            super(CheckerDialog, self).event(event)
         return False
 
 
