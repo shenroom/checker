@@ -57,14 +57,47 @@ class CheckItemWidget(QtGui.QFrame):
         result_data = self.checker.scan(select_state)
         self._parent.clear_error_info()
         if result_data:
-            self.set_state('error')
-            self._parent.output_info(u'Error（发现错误）！')
-            self._parent.error_node_collection(self, result_data)
-            if not self._data.get('auto'):
-                self._parent.output_info(u'Can not be repaired automatically！Please manually solve！（该项不能自动修复呃，请手动修复吧！）')
+            # 1.错误，中断
+            if result_data[0]:
+                data = result_data[1]
+                self.set_state('error')
+                self._parent.output_info(u'Error（发现错误）！')
+                if data:
+                    # a.发现错误，显示错误数据（有数据）
+                    self._parent.error_node_collection(self, data)
+                    if not self._data.get('auto'):
+                        self._parent.output_info(u'Can not be repaired automatically！Please manually solve！（该项不能自动修复呃，请手动修复吧！）')
+                    else:
+                        self._parent.output_info(u'This can be repaired automatically！（该项可以自动修复哦！）')
+                else:
+                    # b.发现错误，不显示错误数据（无数据）
+                    self._parent.clear_error_info()
+                    info_str = result_data[-1]
+                    if info_str:
+                        self._parent.output_info(info_str)
+                    self._parent.output_info(u'Please manually solve！（请手动修复吧！）')
+                return True
+            # 2.忽略，继续（主要针对同一环节，不同类型资产，不如模型环节的set类型资产）
             else:
-                self._parent.output_info(u'This can be repaired automatically！（该项可以自动修复哦！）')
-            return True
+                self.set_state('skip')
+                info_str = result_data[-1]
+                if info_str:
+                    self._parent.output_info(info_str)
+                self._parent.output_info(u'Skip check ！（跳过检查！）')
+
+                if not self._parent._batch:
+                    if self.uuid not in self._parent.pass_list:
+                        self._parent.pass_list.append(self.uuid)
+                return False
+
+            # self.set_state('error')
+            # self._parent.output_info(u'Error（发现错误）！')
+            # self._parent.error_node_collection(self, result_data)
+            # if not self._data.get('auto'):
+            #     self._parent.output_info(u'Can not be repaired automatically！Please manually solve！（该项不能自动修复呃，请手动修复吧！）')
+            # else:
+            #     self._parent.output_info(u'This can be repaired automatically！（该项可以自动修复哦！）')
+            # return True
         else:
             self.set_state('pass')
             self._parent.output_info(u'Check through！（检查通过！）')
@@ -112,6 +145,11 @@ class CheckItemWidget(QtGui.QFrame):
             self._ui.skip_btn.setVisible(self._data.get('skip'))
         elif state == 'pass':
             self._ui.state_icon.setPixmap(':/icons/success.png')
+            self._ui.scan_btn.setVisible(0)
+            self._ui.solve_btn.setVisible(0)
+            self._ui.skip_btn.setVisible(0)
+        elif state == 'skip':
+            self._ui.state_icon.setPixmap(':/icons/warning.png')
             self._ui.scan_btn.setVisible(0)
             self._ui.solve_btn.setVisible(0)
             self._ui.skip_btn.setVisible(0)

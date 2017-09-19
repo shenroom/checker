@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'core\resources\check_item_widget.ui'
 #
-# Created: Wed Sep 13 16:19:20 2017
+# Created: Tue Sep 19 11:26:48 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_check_item_widget(object):
     def setupUi(self, check_item_widget):
         check_item_widget.setObjectName("check_item_widget")
-        check_item_widget.resize(430, 39)
+        check_item_widget.resize(495, 34)
         self.verticalLayout = QtGui.QVBoxLayout(check_item_widget)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)

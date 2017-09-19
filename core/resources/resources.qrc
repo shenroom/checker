@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>warning.png</file>
     <file>box_hover.png</file>
     <file>box_checked.png</file>
     <file>scroll_down.png</file>

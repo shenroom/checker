@@ -15,13 +15,12 @@ class Checker():
             [True data]           错误！中断检查，并列出错误结果数据data. (有数据)
             [True, False, info]   错误！中断检查，如果给定info将会显示info信息。 （无错误数据，如：空场景，没有检查的数据）
             [False, info]         跳过！继续检查其他项，如果给定info将会显示info信息
-            False                 检查通过！
+            False                 检查通过
+
         """
         self.data_dict = {}
-        
-        pass
 
-        return [0, u'不是set类型，跳过该项检查!']
+        return [1, 0, u'场景中还没有任何物体！']
 
 
     def solve(self):
