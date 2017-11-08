@@ -21,7 +21,7 @@ class Checker():
         
         pass
 
-        return [0, u'不是set类型，跳过该项检查!']
+        return #[0, u'不是set类型，跳过该项检查!']
 
 
     def solve(self):

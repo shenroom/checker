@@ -1,14 +1,25 @@
 
+# checker_actions:
+#     -
+#         name: 字符串类型，显示在UI界面上面的检查项名字
+#         type: 列表类型，可缺省，配置检查项针对当前环节具体类型的资产，缺省的话代表适用当前环节的所有类型资产           
+#         skip: 布尔类型，用于配置检查项是否可以手动取消检查
+#         auto: 布尔类型，用于配置检查项是否可以自动修复(需要配合hooks功能)
+#         description: 字符串类型，检查项的描述信息
+#         handler: 字符串类型，检查项的功能代码（hooks）文件名，不带后缀！
+
+
 checker_actions:
     -
         name: 'sampleChecker | 样例'
-        skip: False
+        type: ['set']
+        skip: True
         auto: False
         description: '这是一个简单的样例！'
         handler: sample_check
     -
         name: 'sample02Checker | 样例02'
-        skip: False
-        auto: False
+        skip: True
+        auto: True
         description: '这是一个简单的样例02！'
         handler: sample02_check

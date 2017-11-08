@@ -23,12 +23,18 @@ class CheckerDialog(QtGui.QDialog):
         self._ui.error_node_list.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         self._ui.error_node_list.setFocusPolicy(QtCore.Qt.NoFocus)
         #
+        self._error_color = 'red'
+        self._run_color = '#ff00ff'
+        self._hint_color = '#ffff00'
+        self._pass_color = '#00ff00'
+        #
         self.config = config
         self.next_cmd = None
         self.checker_item = {}
         self.checker_uuid_list = []
         self.current_uuid = None
         self._batch = False
+        self._asset_type = None
         self.pass_list = []
         self.hooks_path = ''
         self.updata_cmd = QtGui.QApplication.instance().processEvents
@@ -70,9 +76,9 @@ class CheckerDialog(QtGui.QDialog):
         Returns:
         """
         if state:
-            self.output_info(u'Turn on（开启批量检查时自动修复功能）')
+            self.output_info(u'Turn on（开启批量检查时自动修复功能）',  color=self._hint_color)
         else:
-            self.output_info(u'Turn off（关闭批量检查时自动修复功能）')
+            self.output_info(u'Turn off（关闭批量检查时自动修复功能）', color=self._hint_color)
 
     def on_check_selected_state_changed(self, state):
         """
@@ -82,9 +88,9 @@ class CheckerDialog(QtGui.QDialog):
         Returns:
         """
         if state:
-            self.output_info(u'Turn on（选择开启：检查选择的物体）')
+            self.output_info(u'Turn on（选择开启：检查选择的物体）',  color=self._hint_color)
         else:
-            self.output_info(u'Turn off（选择关闭：检查整个场景）')
+            self.output_info(u'Turn off（选择关闭：检查整个场景）',  color=self._hint_color)
 
     def get_select_state(self):
         """
@@ -126,9 +132,9 @@ class CheckerDialog(QtGui.QDialog):
         """
         self._batch = True
         if not self.checker_uuid_list:
-            self.output_info(u'No check item（没有检查项）！')
+            self.output_info(u'No check item（没有检查项）！',  color=self._hint_color)
             return
-        self.output_info(u'Batch checking （开始批量检查）......')
+        self.output_info(u'Batch checking （开始批量检查）......',  color=self._hint_color)
         self.pass_list = []
 
         for checker_uuid in self.checker_uuid_list:
@@ -150,9 +156,9 @@ class CheckerDialog(QtGui.QDialog):
         Returns:
         """
         if not self._batch:
-            self.output_info(u'Must be batch check first! （仅用于批量检查中断时）！')
+            self.output_info(u'Must be batch check first! （仅用于批量检查中断时）！',  color=self._hint_color)
             return
-        self.output_info(u'Continue checking （继续上次检查）......')
+        self.output_info(u'Continue checking （继续上次检查）......',  color=self._hint_color)
         for checker_uuid in self.checker_uuid_list:
             if checker_uuid in self.pass_list:
                 continue
@@ -200,22 +206,29 @@ class CheckerDialog(QtGui.QDialog):
         """
         config_file = self.get_config_file()
         if not config_file:
-            self.output_info(u'Can not find config file！Please contact TD！（配置文件不存在，请联系TD解决！）')
+            self.output_info(u'Can not find config file！Please contact TD！（配置文件不存在，请联系TD解决！）', color=self._error_color)
             self.setEnabled(0)
             return
         self._refresh_ui()
         config_data = parse_yaml_file(config_file)
         if not config_data:
-            self.output_info(u'Config error！Please contact TD！（配置文件错误！请联系TD解决！）')
+            self.output_info(u'Config error！Please contact TD！（配置文件错误！请联系TD解决！）', color=self._error_color)
             return
+        
         self.hooks_path = self.get_hooks_path(config_data.get('hooks_path'))
         if not self.hooks_path:
-            self.output_info(u'Config error！Please contact TD！（hooks_path 配置错误！请联系TD解决！）')
+            self.output_info(u'Config error！Please contact TD！（hooks_path 配置错误！请联系TD解决！）', color=self._error_color)
             self.setEnabled(0)
             return
         checker_actions = config_data.get('checker_actions')
         sys.path.append(self.hooks_path)
         for checker_data in checker_actions:
+            # TODO
+            if self._asset_type:
+                checker_type = checker_data.get('type', 0)
+                if checker_type:
+                    if self._asset_type not in checker_type:
+                        continue
             item = self._init_checker_item(checker_data)
             self.checker_item[item.uuid] = item
             self.checker_uuid_list.append(item.uuid)
@@ -328,15 +341,17 @@ class CheckerDialog(QtGui.QDialog):
             self.set_counter(counter)
             self.updata_cmd()
 
-    def output_info(self, text):
+    def output_info(self, text, color='#aaaaaa'):
         """
         信息反馈输出，便于制作人员对检查状态的了解
         Args:
             text: 反馈输出的信息
         Returns:
         """
-        self._ui.output_screen.appendPlainText(text)
-        self._ui.output_screen.moveCursor(QtGui.QTextCursor.End)
+        # self._ui.output_screen.appendPlainText(text)
+        # self._ui.output_screen.moveCursor(QtGui.QTextCursor.End)
+        self._ui.output_screen.appendHtml(u"<head><meta charset=\"UTF-8\"></head><font color={}>{}</font>".format(color, text))
+
 
     def showEvent(self, event):
         """
@@ -353,8 +368,12 @@ class CheckerDialog(QtGui.QDialog):
         #     try:
         #         import tank
         #         self.next_cmd = tank.platform.current_engine().commands['Publish...']['callback']
+        #         sg = tank.platform.current_engine().shotgun
+        #         asset_id = tank.platform.current_engine().context.entity['id']
+        #         self._asset_type = sg.find('Asset', [['id', 'is', asset_id]], ['sg_asset_type'])[0]['sg_asset_type']  
         #     except:
         #         self.next_cmd = None
+        #         self._asset_type = None
         super(CheckerDialog, self).showEvent(event)
 
     def closeEvent(self, event):
