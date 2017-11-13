@@ -7,27 +7,28 @@
 
 
 class Checker():
+    data_dict = [0, u'不是set类型，跳过该项检查!']
     def scan(self, select=0):
         """
         扫描场景并返回结果数据，数据为空则检查通过
         data数据结果为字典，且字典的键值对的键为节点名字，值为列表，即{nodeName1:[...], ...}
         Returns:
-            [True data]           错误！中断检查，并列出错误结果数据data. (有数据)
+            [True data, info]           错误！中断检查，并列出错误结果数据data. (有数据)
             [True, False, info]   错误！中断检查，如果给定info将会显示info信息。 （无错误数据，如：空场景，没有检查的数据）
             [False, info]         跳过！继续检查其他项，如果给定info将会显示info信息
             False                 检查通过！
         """
-        self.data_dict = {}
-        
-        pass
 
-        return #[0, u'不是set类型，跳过该项检查!']
+
+
+        return self.data_dict
 
 
     def solve(self):
         """
         根据扫描数据自动修复，如果配置文件auto属性为True则次方法要实现
         """
+        self.data_dict = {}
         pass
 
     def select(self, obj):

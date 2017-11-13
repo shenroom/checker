@@ -52,7 +52,7 @@ class CheckItemWidget(QtGui.QFrame):
         开始检查
         Returns: True则检查失败 False则检查通过
         """
-        self._parent.output_info(u'>>> Checking（开始检查）： %s' % self._ui.check_name.text(), color=self._parent._run_color)
+        self._parent.output_info(u'>>> 开始检查： %s' % self._ui.check_name.text(), color=self._parent._run_color)
         self._parent.current_uuid = self.uuid
         select_state = self._parent.get_select_state()
         result_data = self.checker.scan(select_state)
@@ -62,29 +62,32 @@ class CheckItemWidget(QtGui.QFrame):
             if result_data[0]:
                 data = result_data[1]
                 self.set_state('error')
-                self._parent.output_info(u'Error（发现错误）！',  color=self._parent._error_color)
+                self._parent.output_info(u'发现错误！',  color=self._parent._error_color)
                 if data:
                     # a.发现错误，显示错误数据（有数据）
                     self._parent.error_node_collection(self, data)
+                    if len(result_data)==3:
+                        info_str = result_data[-1]
+                        self._parent.output_info(info_str, color=self._parent._info_color, status=1)
                     if not self._data.get('auto'):
-                        self._parent.output_info(u'Can not be repaired automatically！Please manually solve！（该项不能自动修复呃，请手动修复吧！）', color=self._parent._hint_color)
+                        self._parent.output_info(u'该项不能自动修复呃，请手动修复吧！', color=self._parent._hint_color)
                     else:
-                        self._parent.output_info(u'This can be repaired automatically！（该项可以自动修复哦！）', color=self._parent._hint_color)
+                        self._parent.output_info(u'该项可以自动修复哦！', color=self._parent._hint_color)
                 else:
                     # b.发现错误，不显示错误数据（无数据）
                     self._parent.clear_error_info()
                     info_str = result_data[-1]
                     if info_str:
-                        self._parent.output_info(info_str, color=self._parent._error_color)
-                    self._parent.output_info(u'Please manually solve！（请手动修复吧！）',  color=self._parent._hint_color)
+                        self._parent.output_info(info_str, color=self._parent._info_color, status=1)
+                    self._parent.output_info(u'请手动修复吧！',  color=self._parent._hint_color)
                 return True
             # 2.忽略，继续（主要针对同一环节，不同类型资产，不如模型环节的set类型资产）
             else:
                 self.set_state('skip')
                 info_str = result_data[-1]
                 if info_str:
-                    self._parent.output_info(info_str)
-                self._parent.output_info(u'Skip check ！（跳过检查！）',  color=self._parent._hint_color)
+                    self._parent.output_info(info_str, color=self._parent._info_color)
+                self._parent.output_info(u'跳过检查！',  color=self._parent._hint_color)
 
                 if not self._parent._batch:
                     if self.uuid not in self._parent.pass_list:
@@ -101,7 +104,7 @@ class CheckItemWidget(QtGui.QFrame):
             # return True
         else:
             self.set_state('pass')
-            self._parent.output_info(u'Check through！（检查通过！）', color=self._parent._pass_color)
+            self._parent.output_info(u'检查通过！', color=self._parent._pass_color)
             if not self._parent._batch:
                 if self.uuid not in self._parent.pass_list:
                     self._parent.pass_list.append(self.uuid)
@@ -112,14 +115,14 @@ class CheckItemWidget(QtGui.QFrame):
         自动修复
         Returns:
         """
-        self._parent.output_info(u'>>> Start repairing（开始修复）： %s' % self._ui.check_name.text(),  color=self._parent._run_color)
+        self._parent.output_info(u'>>> 开始修复： %s' % self._ui.check_name.text(),  color=self._parent._run_color)
         self.checker.solve()
-        self._parent.output_info(u'Repair completed！self checking！（修复完成！开始修复后自检！）',  color=self._parent._hint_color)
+        self._parent.output_info(u'修复完成！开始修复后自检！',  color=self._parent._hint_color)
         data = self.on_scan_btn_clicked()
         if data:
-            self._parent.output_info(u'Repair failed ！Please contact TD！（修复失败，请联系TD ！）',  color=self._parent._error_color)
+            self._parent.output_info(u'修复失败，请联系TD ！',  color=self._parent._error_color)
             return True
-        self._parent.output_info(u'Successful repair！（修复成功！）',  color=self._parent._pass_color)
+        self._parent.output_info(u'修复成功！',  color=self._parent._pass_color)
 
     def on_skip_btn_clicked(self):
         """
@@ -128,7 +131,7 @@ class CheckItemWidget(QtGui.QFrame):
         """
         self.close()
         self._parent.checker_uuid_list.remove(self.uuid)
-        self._parent.output_info(u"Cancle check（取消检查）： %s" % self._ui.check_name.text(),  color=self._parent._hint_color)
+        self._parent.output_info(u"取消检查： %s" % self._ui.check_name.text(),  color=self._parent._hint_color)
 
     def set_state(self, state='error'):
         """
@@ -151,9 +154,13 @@ class CheckItemWidget(QtGui.QFrame):
             self._ui.skip_btn.setVisible(0)
         elif state == 'skip':
             self._ui.state_icon.setPixmap(':/icons/warning.png')
-            self._ui.scan_btn.setVisible(0)
-            self._ui.solve_btn.setVisible(0)
-            self._ui.skip_btn.setVisible(0)
+            # self._ui.scan_btn.setVisible(0)
+            # self._ui.solve_btn.setVisible(0)
+            # self._ui.skip_btn.setVisible(0)
+
+            self._ui.scan_btn.setVisible(1)
+            self._ui.solve_btn.setVisible(self._data.get('auto'))
+            self._ui.skip_btn.setVisible(self._data.get('skip'))
 
     def mouseReleaseEvent(self, *event):
         """

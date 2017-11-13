@@ -14,7 +14,7 @@ checker_actions:
         name: 'sampleChecker | 样例'
         type: ['set']
         skip: True
-        auto: False
+        auto: True
         description: '这是一个简单的样例！'
         handler: sample_check
     -

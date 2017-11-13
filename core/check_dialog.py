@@ -18,14 +18,17 @@ class CheckerDialog(QtGui.QDialog):
         super(CheckerDialog, self).__init__(parent)
         self._ui = Ui_check_dialog()
         self._ui.setupUi(self)
-        self.setWindowTitle('Checker')
+        self._title = 'Checker'
+        self.setWindowTitle(self._title)
+        self._set_logo()
 
         self._ui.error_node_list.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         self._ui.error_node_list.setFocusPolicy(QtCore.Qt.NoFocus)
         #
-        self._error_color = 'red'
-        self._run_color = '#ff00ff'
-        self._hint_color = '#ffff00'
+        self._error_color = '#ff0000'
+        self._run_color = '#aa00aa'
+        self._info_color = '#eeee00'
+        self._hint_color = '#6a6a00'
         self._pass_color = '#00ff00'
         #
         self.config = config
@@ -49,6 +52,13 @@ class CheckerDialog(QtGui.QDialog):
         self._ui.cancle_btn.clicked.connect(self.close)
         self._ui.next_btn.clicked.connect(self.on_next_btn_clicked)
 
+    def _set_logo(self):
+        try:
+            from framewidget import LogoFrame
+            logo_frame = LogoFrame(name=self._title)
+            logo_frame.set_bottom_border(1)
+            self._ui.main_layout.insertWidget(0, logo_frame)
+        except:pass
 
     def on_next_btn_clicked(self):
         """
@@ -132,9 +142,9 @@ class CheckerDialog(QtGui.QDialog):
         """
         self._batch = True
         if not self.checker_uuid_list:
-            self.output_info(u'No check item（没有检查项）！',  color=self._hint_color)
+            self.output_info(u'没有检查项！',  color=self._hint_color)
             return
-        self.output_info(u'Batch checking （开始批量检查）......',  color=self._hint_color)
+        self.output_info(u'开始批量检查...',  color=self._hint_color)
         self.pass_list = []
 
         for checker_uuid in self.checker_uuid_list:
@@ -156,9 +166,9 @@ class CheckerDialog(QtGui.QDialog):
         Returns:
         """
         if not self._batch:
-            self.output_info(u'Must be batch check first! （仅用于批量检查中断时）！',  color=self._hint_color)
+            self.output_info(u'仅用于批量检查中断时！',  color=self._hint_color)
             return
-        self.output_info(u'Continue checking （继续上次检查）......',  color=self._hint_color)
+        self.output_info(u'继续上次检查...',  color=self._hint_color)
         for checker_uuid in self.checker_uuid_list:
             if checker_uuid in self.pass_list:
                 continue
@@ -206,18 +216,18 @@ class CheckerDialog(QtGui.QDialog):
         """
         config_file = self.get_config_file()
         if not config_file:
-            self.output_info(u'Can not find config file！Please contact TD！（配置文件不存在，请联系TD解决！）', color=self._error_color)
+            self.output_info(u'配置文件不存在，请联系TD解决！', color=self._error_color)
             self.setEnabled(0)
             return
         self._refresh_ui()
         config_data = parse_yaml_file(config_file)
         if not config_data:
-            self.output_info(u'Config error！Please contact TD！（配置文件错误！请联系TD解决！）', color=self._error_color)
+            self.output_info(u'配置文件错误！请联系TD解决！', color=self._error_color)
             return
         
         self.hooks_path = self.get_hooks_path(config_data.get('hooks_path'))
         if not self.hooks_path:
-            self.output_info(u'Config error！Please contact TD！（hooks_path 配置错误！请联系TD解决！）', color=self._error_color)
+            self.output_info(u'hooks_path 配置错误！请联系TD解决！', color=self._error_color)
             self.setEnabled(0)
             return
         checker_actions = config_data.get('checker_actions')
@@ -341,7 +351,7 @@ class CheckerDialog(QtGui.QDialog):
             self.set_counter(counter)
             self.updata_cmd()
 
-    def output_info(self, text, color='#aaaaaa'):
+    def output_info(self, text, color='#aaaaaa', status=False):
         """
         信息反馈输出，便于制作人员对检查状态的了解
         Args:
@@ -350,8 +360,18 @@ class CheckerDialog(QtGui.QDialog):
         """
         # self._ui.output_screen.appendPlainText(text)
         # self._ui.output_screen.moveCursor(QtGui.QTextCursor.End)
-        self._ui.output_screen.appendHtml(u"<head><meta charset=\"UTF-8\"></head><font color={}>{}</font>".format(color, text))
-
+        try:
+            # if status:
+            #     self._ui.output_screen.appendHtml(
+            #         u"<head><meta charset=\"UTF-8\"></head><font color={}>{}</font>".format(color, text))
+            # else:
+            #     self._ui.output_screen.appendHtml(
+            #         u"<head><meta charset=\"UTF-8\"></head><i><font color={}>{}</font></i>".format(color, text))
+            self._ui.output_screen.appendHtml(
+                u"<head><meta charset=\"UTF-8\"></head><font color={}>{}</font>".format(color, text))
+        except:
+            self._ui.output_screen.appendPlainText(text)
+            self._ui.output_screen.moveCursor(QtGui.QTextCursor.End)
 
     def showEvent(self, event):
         """
