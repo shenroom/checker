@@ -86,7 +86,7 @@ class CheckItemWidget(QtGui.QFrame):
                 self.set_state('skip')
                 info_str = result_data[-1]
                 if info_str:
-                    self._parent.output_info(info_str, color=self._parent._info_color)
+                    self._parent.output_info(info_str, color=self._parent._info_color, status=1)
                 self._parent.output_info(u'跳过检查！',  color=self._parent._hint_color)
 
                 if not self._parent._batch:
