@@ -205,9 +205,13 @@ class CheckerDialog(QtGui.QDialog):
         if os.path.isfile(self.config):
             return self.config
         else:
-            config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', self.config)
-            if os.path.isfile(config_path):
-                return config_path.replace('\\', '/')
+            config_path = os.getenv("PREPUBLISH_CONFIG_PATH")
+            if confign_path and os.path.isdif(config_path):
+                config_file = os.path.join(config_path, self.config)
+            else:
+                config_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', self.config)
+            if os.path.isfile(config_file):
+                return config_file.replace('\\', '/')
 
     def on_refresh_btn_clicked(self):
         """
@@ -251,12 +255,12 @@ class CheckerDialog(QtGui.QDialog):
         Returns:
         """
         if not file_path:
-            hooks_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', 'hooks')
+            hooks_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'hooks')
             return hooks_path.replace('\\', '/')
         if os.path.isdir(file_path):
             return file_path
         else:
-            hooks_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', 'hooks', self.config)
+            hooks_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'hooks', file_path)
             if os.path.isdir(hooks_path):
                 return hooks_path.replace('\\', '/')
             else:
@@ -309,7 +313,12 @@ class CheckerDialog(QtGui.QDialog):
         if len(item_list) == 1:
             node_name = item_list[0].text()
             attr_list = self.error_dict.get(node_name)
-            self.output_info(str(attr_list))
+            self.output_info(str(node_name)+' >> ' )
+            if isinstance(attr_list, list):
+                for attr in attr_list:
+                    self.output_info(str(attr))
+            else:
+                self.output_info(str(attr_list))
             checker.select([node_name])
         else:
             node_list = []

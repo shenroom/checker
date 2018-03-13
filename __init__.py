@@ -3,5 +3,5 @@
 # title       :
 # description :
 # author      :'ShenMeng'
-from .core.main_window import MainWindow, WinShotgun
+
 
